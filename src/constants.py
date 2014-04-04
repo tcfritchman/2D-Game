@@ -1,0 +1,3 @@
+# Game constants
+WINDOWWIDTH = 800
+WINDOWHEIGHT = 600
