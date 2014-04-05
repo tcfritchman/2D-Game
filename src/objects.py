@@ -1,4 +1,4 @@
-import pygame, sys, os
+import pygame, sys, os, math
 from pygame.locals import *
 from constants import *
 from utils import *
@@ -6,7 +6,7 @@ from utils import *
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image, self.rect = load_image('guy16.png', -1)
+        self.image, self.rect = load_image('guy16.png', (0,0,0))
 	self.last_rect = self.rect
         self.movement = 'none'
         self.jumping = False
@@ -113,5 +113,36 @@ class TestPlatform(pygame.sprite.Sprite):
         self.image.fill((0, 0, 0))
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
+
+class Platform(pygame.sprite.Sprite):
+    def __init__(self):
+	pygame.sprite.Sprite.__init__(self)
+	self.image = pygame.Surface([120, 25])
+	self.image.fill((0, 0, 0))
+	self.rect = self.image.get_rect()
     
+    def update(self):
+	self.rect.x += PLATFORM_SPEED
+
+    def set_position(self, x, y):
+	self.rect.topleft = (x, y)
+
+class PlatformGenerator:
+    def __init__(self):
+        self.framecounter = 0
+	self._framemax = (PLATFORM_WIDTH + PLATFORM_GAP) / abs(PLATFORM_SPEED) 
+
+    def update():
+	if self.framecounter == self._framemax:
+	    # Generate a new platform
+	    plat = Platform()
+	    plat.set_position(WINDOWWIDTH + 20, WINDOWHEIGHT - 50)
+	    self.framecounter = 0
+	    self.framecounter += 1
+	    return plat()
+    	else:
+	    self.framecounter += 1
+	    return False
+	
+	
 

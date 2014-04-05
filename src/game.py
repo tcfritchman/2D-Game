@@ -23,18 +23,13 @@ def main():
     # Create game objects
     print "Loading objects..."
     player = Player()
-
-    platform1 = TestPlatform(25, 500)
-    platform2 = TestPlatform(-200, 350)
-    platform3 = TestPlatform(-400, 425)
+    platform_generator = PlatformGenerator()
 
     # Object groups
-    allsprites = pygame.sprite.Group((player, platform1, platform2, platform3))
-    colliders = pygame.sprite.Group((platform1, platform2, platform3))
+    allsprites = pygame.sprite.Group((player))
+    colliders = pygame.sprite.Group()
 
     clock = pygame.time.Clock()
-
-    
 
     # Game loop
     print "Objects loaded. Running game loop..."
@@ -56,6 +51,11 @@ def main():
                     player.move_none()
                 if event.key == K_SPACE:
                     player.stop_jump()
+
+	new_platform = platform_generator.update()
+	if (new_platform):
+	    colliders.add(new_platform)
+	    
 
         allsprites.update()
         player.detect_collisions(colliders)
