@@ -7,6 +7,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image, self.rect = load_image('guy16.png', -1)
+	self.last_rect = self.rect
         self.movement = 'none'
         self.jumping = False
         #self.frame_time = 1 / FPS
@@ -16,11 +17,7 @@ class Player(pygame.sprite.Sprite):
         self.yvelocity = 0
         self.xposition = 0
         self.yposition = 0
-        self.top_collision = False
         self.bottom_collision = False
-        self.left_collision = False
-        self.right_collision = False
-
 
     def update(self):
         # Calculate forces (factors in gravity)
@@ -36,9 +33,6 @@ class Player(pygame.sprite.Sprite):
             self.yvelocity = 0
         else:
             self.yforce = GRAVITY
-        if self.left_collision:
-            self.xforce = 0
-            self.xvelocity = 0
         
         if self.jumping:
             self.yforce += JUMP_FORCE
@@ -47,11 +41,15 @@ class Player(pygame.sprite.Sprite):
         self.xvelocity = FRICTION * (self.xvelocity + self.xforce)
         self.yvelocity = self.yvelocity + self.yforce
 
+	if self.bottom_collision:
+	    self.xvelocity = PLATFORM_SPEED + (FRICTION * (self.xvelocity + self.xforce))
+
         # Calculate new position
         self.xposition = self.xposition + self.xvelocity
         self.yposition = self.yposition + self.yvelocity
 
-        # Update position
+        # Update position and save last position
+	self.last_rect = self.rect.copy()
         self.rect.topleft = (self.xposition, self.yposition)
 
     def force(self, amount):
@@ -89,10 +87,6 @@ class Player(pygame.sprite.Sprite):
             B = False
             L = False
             R = False
-            t = False
-            b = False
-            l = False
-            r = False
             # top line cross
             if self.rect.top < collider.rect.bottom:
                 T = True
@@ -105,42 +99,11 @@ class Player(pygame.sprite.Sprite):
             # right line cross
             if self.rect.right > collider.rect.left:
                 R = True
-            # top line cross
-            if self.rect.top < collider.rect.top:
-                t = True
-            # bottom line cross
-            if self.rect.bottom > collider.rect.bottom:
-                b = True
-            # left line cross
-            if self.rect.left < collider.rect.left:
-                l = True
-            # right line cross
-            if self.rect.right > collider.rect.right:
-                r = True
-            if T and B and L and R:
-                if b:
-                    self.top_collision = True
-                    self.rect.top = collider.rect.bottom
-                if t:
+            if T and B and L and R:	# A collision has occurred
+		if self.rect.y >= self.last_rect.y and self.last_rect.bottom <= collider.rect.top:
+		    # A bottom collision has occured
                     self.bottom_collision = True
                     self.rect.bottom = collider.rect.top
-                if r and not (t or b):
-                    self.left_collision = True
-                    self.rect.left = collider.rect.right
-                if l and not (t or b):
-                    self.right_collision = True
-                    self.rect.right = collider.rect.left
-
-
-
-
-                
-
-
-
-
-        
-            
         
 
 class TestPlatform(pygame.sprite.Sprite):
