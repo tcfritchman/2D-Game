@@ -23,18 +23,39 @@ def main():
     # Create game objects
     print "Loading objects..."
     player = Player()
-    allsprites = pygame.sprite.Group((player))
+
+    platform = TestPlatform()
+
+    # Object groups
+    allsprites = pygame.sprite.Group((player, platform))
+    colliders = pygame.sprite.Group((platform))
+
     clock = pygame.time.Clock()
+
+    
 
     # Game loop
     print "Objects loaded. Running game loop..."
     while 1:
         clock.tick(30)
-
+        
         for event in pygame.event.get():
             if event.type == QUIT:
                 return
+            if event.type == KEYDOWN:
+                if event.key == K_RIGHT:
+                    player.move_right()
+                elif event.key == K_LEFT:
+                    player.move_left()
+                if event.key == K_SPACE:
+                    player.jump()
+            elif event.type == KEYUP:
+                if event.key == K_RIGHT or event.key == K_LEFT:
+                    player.move_none()
+                if event.key == K_SPACE:
+                    player.stop_jump()
 
+        player.detect_collisions(colliders)
         allsprites.update()
 
         screen.blit(background, (0, 0))
